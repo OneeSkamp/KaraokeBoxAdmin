@@ -3,30 +3,9 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Unity WebGL Player | %UNITY_PRODUCT_NAME%</title>
+    <title>Unity WebGL Player | karaokebox</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
-
-    <!-- Firebase compat scripts (must be before Unity loader) -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
-    <script>
-      const firebaseConfig = {
-        apiKey: "AIzaSyB9If7MobAV3tnkij1taLHgV1cfMyFhgCc",
-        authDomain: "karaokebox-acab1.firebaseapp.com",
-        databaseURL: "https://karaokebox-acab1-default-rtdb.europe-west1.firebasedatabase.app",
-        projectId: "karaokebox-acab1",
-        storageBucket: "karaokebox-acab1.appspot.com",
-        messagingSenderId: "284368336109",
-        appId: "1:284368336109:web:55f029d9666c0221c648e4",
-        measurementId: "G-KCV49PNMX9"
-      };
-      if (!window.firebase || !firebase.apps || !firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-      }
-    </script>
   </head>
   <body>
     <div id="unity-container" class="unity-desktop">
@@ -41,11 +20,11 @@
       <div id="unity-footer">
         <div id="unity-webgl-logo"></div>
         <div id="unity-fullscreen-button"></div>
-        <div id="unity-build-title">%UNITY_PRODUCT_NAME%</div>
+        <div id="unity-build-title">karaokebox</div>
       </div>
     </div>
-
     <script>
+
       var container = document.querySelector("#unity-container");
       var canvas = document.querySelector("#unity-canvas");
       var loadingBar = document.querySelector("#unity-loading-bar");
@@ -53,6 +32,12 @@
       var fullscreenButton = document.querySelector("#unity-fullscreen-button");
       var warningBanner = document.querySelector("#unity-warning");
 
+      // Shows a temporary message banner/ribbon for a few seconds, or
+      // a permanent error message on top of the canvas if type=='error'.
+      // If type=='warning', a yellow highlight color is used.
+      // Modify or remove this function to customize the visually presented
+      // way that non-critical warnings and error messages are presented to the
+      // user.
       function unityShowBanner(msg, type) {
         function updateBannerVisibility() {
           warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
@@ -71,52 +56,67 @@
         updateBannerVisibility();
       }
 
+      var buildUrl = "Build";
+      var loaderUrl = buildUrl + "/wglkaraokebox.loader.js";
+      var config = {
+        dataUrl: buildUrl + "/wglkaraokebox.data.unityweb",
+        frameworkUrl: buildUrl + "/wglkaraokebox.framework.js.unityweb",
+        codeUrl: buildUrl + "/wglkaraokebox.wasm.unityweb",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "shapesandsounds",
+        productName: "karaokebox",
+        productVersion: "0.1.5",
+        showBanner: unityShowBanner,
+      };
+
+      // By default, Unity keeps WebGL canvas render target size matched with
+      // the DOM size of the canvas element (scaled by window.devicePixelRatio)
+      // Set this to false if you want to decouple this synchronization from
+      // happening inside the engine, and you would instead like to size up
+      // the canvas DOM size and WebGL render target sizes yourself.
+      // config.matchWebGLToCanvasSize = false;
+
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        // Mobile device style: fill the whole browser client area with the game canvas:
+
         var meta = document.createElement('meta');
         meta.name = 'viewport';
         meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
         document.getElementsByTagName('head')[0].appendChild(meta);
         container.className = "unity-mobile";
         canvas.className = "unity-mobile";
+
+        // To lower canvas resolution on mobile devices to gain some
+        // performance, uncomment the following line:
+        // config.devicePixelRatio = 1;
+
+
       } else {
+        // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
+
         canvas.style.width = "960px";
         canvas.style.height = "600px";
       }
 
       loadingBar.style.display = "block";
 
-      // Expose unity instance globally for jslib plugins expecting it
-      var unityInstance = null; // some plugins use this symbol
-      window.unityInstance = null;
-
       var script = document.createElement("script");
-      script.src = "%UNITY_WEBGL_LOADER_URL%";
+      script.src = loaderUrl;
       script.onload = () => {
-        createUnityInstance(canvas, {
-          dataUrl: "%UNITY_WEBGL_DATA_URL%",
-          frameworkUrl: "%UNITY_WEBGL_FRAMEWORK_URL%",
-          codeUrl: "%UNITY_WEBGL_CODE_URL%",
-          streamingAssetsUrl: "StreamingAssets",
-          companyName: "%UNITY_COMPANY_NAME%",
-          productName: "%UNITY_PRODUCT_NAME%",
-          productVersion: "%UNITY_PRODUCT_VERSION%",
-          showBanner: unityShowBanner,
-        }, (progress) => {
+        createUnityInstance(canvas, config, (progress) => {
           progressBarFull.style.width = 100 * progress + "%";
-        }).then((instance) => {
-          window.unityInstance = instance;
-          unityInstance = instance;
-          loadingBar.style.display = "none";
-          fullscreenButton.onclick = () => {
-            instance.SetFullscreen(1);
-          };
-        }).catch((message) => {
-          alert(message);
-        });
-      };
+              }).then((unityInstance) => {
+                loadingBar.style.display = "none";
+                fullscreenButton.onclick = () => {
+                  unityInstance.SetFullscreen(1);
+                };
+              }).catch((message) => {
+                alert(message);
+              });
+            };
+
       document.body.appendChild(script);
+
     </script>
   </body>
-  </html>
-
-
+</html>

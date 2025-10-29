@@ -121,15 +121,19 @@
 
       loadingBar.style.display = "block";
 
+      // Expose unity instance globally for WebGL plugins expecting it
+      window.unityInstance = null;
+
       var script = document.createElement("script");
       script.src = loaderUrl;
       script.onload = () => {
         createUnityInstance(canvas, config, (progress) => {
           progressBarFull.style.width = 100 * progress + "%";
-              }).then((unityInstance) => {
+              }).then((instance) => {
+                window.unityInstance = instance;
                 loadingBar.style.display = "none";
                 fullscreenButton.onclick = () => {
-                  unityInstance.SetFullscreen(1);
+                  instance.SetFullscreen(1);
                 };
               }).catch((message) => {
                 alert(message);

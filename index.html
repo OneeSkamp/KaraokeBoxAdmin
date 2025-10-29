@@ -23,6 +23,27 @@
         <div id="unity-build-title">karaokebox</div>
       </div>
     </div>
+    <!-- Firebase compat scripts (must be before Unity loader) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyB9If7MobAV3tnkij1taLHgV1cfMyFhgCc",
+        authDomain: "karaokebox-acab1.firebaseapp.com",
+        databaseURL: "https://karaokebox-acab1-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "karaokebox-acab1",
+        storageBucket: "karaokebox-acab1.appspot.com",
+        messagingSenderId: "284368336109",
+        appId: "1:284368336109:web:55f029d9666c0221c648e4",
+        measurementId: "G-KCV49PNMX9"
+      };
+      if (!window.firebase || !firebase.apps || !firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+      }
+    </script>
+
     <script>
 
       var container = document.querySelector("#unity-container");
